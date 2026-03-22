@@ -6,6 +6,7 @@ import random
 import math
 import time
 import sys 
+import os
 
 #for debugging purposes I have added these
 #speed = 0.5
@@ -13,11 +14,19 @@ import sys
 pygame.init()
 
 tryagain = "Y"
-fuelcells = 10
-loops = 1
-money = 0
-speed = 0
-distance = 0
+class player:
+    def __init__(self):
+        self.fuelcells = 10
+        self.deliveries = 0
+        self.money = 0
+    def payment(self, amount):
+        self.money += amount
+    def lose_fuel(self,amount):
+        self.fuelcells -= amount
+    def gain_fuel(self, amount):
+        self.fuelcells += amount
+player = player()
+
 from pygame import font
 gamestarted = False
 
@@ -30,28 +39,32 @@ gamestarted = False
 def splash():
     
     pygame.time.Clock
-    WINDOW_WIDTH = 800
-    WINDOW_HEIGHT = 600
+    WINDOW_WIDTH = 1600
+    WINDOW_HEIGHT = 1200
     TEXTCOLOUR = (255, 255, 255)
-    size = (WINDOW_WIDTH, WINDOW_HEIGHT)
-    Titlefont = pygame.font.SysFont('freesans', 32 )
-    Startfont = pygame.font.Font('Nerd.ttf', 16)
-    font = pygame.font.SysFont('freesans', 16 )
-    font = pygame.font.SysFont('freesans', 16 )
+    Titlefont = pygame.font.SysFont('freesans', 64 )
+    Startfont = pygame.font.Font('Nerd.ttf', 32)
+    font = pygame.font.SysFont('freesans', 32 )
     screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
     text = font.render('All characters and their appearances in time are not factual and should NOT be fact checked.', True, TEXTCOLOUR) 
     text2 = Titlefont.render('About Time.', True, TEXTCOLOUR) 
-    Starttext = Startfont.render('Clock in.[Press any letter]', True, TEXTCOLOUR)
-    Starttextpos = ((350, 500))
-    flashpos = pygame.Rect((350, 500, 200, 20))
+    Starttext = Startfont.render('PRESS ENTER TO CLOCK IN', True, TEXTCOLOUR)
+    Starttextpos = ((620, 1002))
+    flashpos = pygame.Rect((620, 1002, 340, 36))
+    unflashpos = pygame.Rect((620, 1002, 340, 36))
+    logo = pygame.image.load(os.path.join('stupid.png'))
 
-    
     textRect = text.get_rect()
     textRect.center = (WINDOW_WIDTH //2, WINDOW_HEIGHT //2)
+
+
+    
+   
     
 
     titleactive = True
-    enterunpressed = True
+    notstarted = True
+    loop = True
     while titleactive:
 
         for event in pygame.event.get() :
@@ -64,21 +77,39 @@ def splash():
         pygame.display.update()
         pygame.time.delay(1000)
         screen.fill((0, 0, 0))
-        screen.blit(text2, textRect)
+        screen.blit(logo, (550,300))
         pygame.time.delay(1000)
  
-        
-        while enterunpressed == True: 
+        while loop == True :
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_RETURN:
+                        pygame.quit()
+                        return ('Introfinish') 
+
+            pygame.event.wait()
+            screen.blit(logo, (550,300))
+            pygame.draw.rect(screen, (0, 0, 0), (unflashpos))
             screen.blit(Starttext,Starttextpos)
-            pygame.display.update()
             pygame.time.delay(1000)
+            pygame.display.update()
+            pygame.time.delay(1000) 
             pygame.draw.rect(screen, (255, 255, 255), (flashpos))
-            pygame.time.delay(250)
-            pygame.display.update() 
-            checkpress=input(str('Type login to start'))
-            if checkpress == 'login':
-                return ('Introfinish') 
-    pygame.quit()        
+            pygame.time.delay(1000)
+            pygame.display.update()
+            
+            #checkpress = input('Type login to start: ')
+            #if checkpress == 'login':
+                #notstarted = False
+                
+            
+
+
+
     
                 
 
@@ -89,15 +120,16 @@ def splash():
 
 
 if splash() == 'Introfinish':
-        while fuelcells > 0 and (tryagain == "Y" or "y" or "YES" or "yes" or "Yes"):
-            
-            
+        while player.fuelcells > 0 and (tryagain == "Y" or "y" or "YES" or "yes" or "Yes"):
+            speed = 0
+            player.deliveries += 1
+            distance = 0 
             
             def years():
                 randomtime = random.random()
-                #howlong = round(randomtime * 100 + 25)
+                howlong = round(randomtime * 100 + 25)
                 #Another Debugging tool to help with testing
-                howlong = 1
+                #howlong = 1
                 return howlong
 
 
@@ -105,11 +137,13 @@ if splash() == 'Introfinish':
             #this is a placeholder until I can be bothered to render the actual animation in blender 
 
 
-            print (f"You have been tasked by the Right On Time delivery service (R.O.T) to deliver packages throughout time.")
+            
 
-
-            if loops == 1:
-                print (f"For your first assignment is to deliver a package to {years()}")
+            if player.deliveries == 1:
+                print (f"You have been tasked by the Right On Time delivery service (R.O.T) to deliver packages throughout time.")
+                print (f"For your first assignment you are tasked to deliver a package to the year {years()}")
+            else:
+                print (f"Your next delivery is at {years()}")
 
 
             while speed >= 1 or speed <= 0 :
@@ -126,7 +160,9 @@ if splash() == 'Introfinish':
 
             timeinside = round(distance/speed)
             timeoutside = round(timeinside/math.sqrt(1-speed*speed))
-
+            moneybase = round(years()-timeoutside)
+            paycheck = abs(moneybase*years())
+            
 
             print (f"You spent {timeinside} years inside the ship")
             print (f"And arrived in {timeoutside} years in the future")
@@ -147,27 +183,31 @@ if splash() == 'Introfinish':
 
             if deliveryresult == ("Not even close"):
                 print ("You didnt make it in time and lost 2 fuel cells")
-                fuelcells -= 2
-
+                player.lose_fuel(2)
+                player.payment(paycheck)
             if deliveryresult == ("On time"):
                 if fuelcells < 10:
                     print ("The R.O.T rewards your perfect landing with 2 fuel cells")
                     print ("You gained +2 fuel cells")
                     fuelcells += 2
+                player.payment(paycheck)
             if deliveryresult == ("Too far"):
                 print ("You went too far and missed the date, the R.O.T is dissapointed in your efforts")
                 print ("You lost 4 fuel cells") 
-                fuelcells -= 4
-
-            print (f"You have {fuelcells} fuel cells remaining")
-            
-            tryagain = input(str("Continue? Y/N: "))
+                player.lose_fuel(4)
+                player.payment(paycheck)
+            print (f"You have {player.fuelcells} fuel cells remaining")
+            print (player.money)
+            print (f'paycheck:{paycheck}')
+                
+            tryagain = input(str("Continue? Y/N: ")).strip().upper()
             
             if tryagain == "Y":
-                loops += 1
+                player.deliveries += 1
+            #player.money(paycheck)
             
-            
-            if tryagain == "N" or "n" or "no" or "No" or "NO":
+            if tryagain == "N":
                 with open("Scores.txt", "a") as achsave:
-                    achsave.write(f"You made {loops} deliveries and got ${money} \n")
-            
+                    achsave.write(f"You made {player.deliveries} deliveries and got ${player.money} \n")
+                    quit()
+                    
