@@ -1,17 +1,11 @@
-
-#WIP not finished product
-
 import pygame
 import random
 import math
-import time
 import sys 
 import os
+from datetime import datetime
 
-#for debugging purposes I have added these
-#speed = 0.5
-#distance = 10
-pygame.init()
+
 
 tryagain = "Y"
 class player:
@@ -26,14 +20,9 @@ class player:
     def gain_fuel(self, amount):
         self.fuelcells += amount
 player = player()
-
-from pygame import font
 gamestarted = False
 
 
-#Titleactive = True 
-
-#while Titleactive :
 
 
 def splash():
@@ -53,17 +42,13 @@ def splash():
     flashpos = pygame.Rect((620, 1002, 340, 36))
     unflashpos = pygame.Rect((620, 1002, 340, 36))
     logo = pygame.image.load(os.path.join('stupid.png'))
-
     textRect = text.get_rect()
     textRect.center = (WINDOW_WIDTH //2, WINDOW_HEIGHT //2)
 
 
-    
-   
-    
+
 
     titleactive = True
-    notstarted = True
     loop = True
     while titleactive:
 
@@ -91,7 +76,7 @@ def splash():
                         pygame.quit()
                         return ('Introfinish') 
 
-            pygame.event.wait()
+            
             screen.blit(logo, (550,300))
             pygame.draw.rect(screen, (0, 0, 0), (unflashpos))
             screen.blit(Starttext,Starttextpos)
@@ -101,19 +86,7 @@ def splash():
             pygame.draw.rect(screen, (255, 255, 255), (flashpos))
             pygame.time.delay(1000)
             pygame.display.update()
-            
-            #checkpress = input('Type login to start: ')
-            #if checkpress == 'login':
-                #notstarted = False
-                
-            
-
-
-
-    
-                
-
-                
+        
             
 
 
@@ -128,13 +101,7 @@ if splash() == 'Introfinish':
             def years():
                 randomtime = random.random()
                 howlong = round(randomtime * 100 + 25)
-                #Another Debugging tool to help with testing
-                #howlong = 1
                 return howlong
-
-
-
-            #this is a placeholder until I can be bothered to render the actual animation in blender 
 
 
             
@@ -151,12 +118,6 @@ if splash() == 'Introfinish':
 
             while distance <= 0 or distance >= 100 :
                 distance = int(input("How far do you want to go? (1-99):"))
-
-
-
-            #Use these for debugging
-            #print (distance)
-            #print (speed)
 
             timeinside = round(distance/speed)
             timeoutside = round(timeinside/math.sqrt(1-speed*speed))
@@ -179,35 +140,109 @@ if splash() == 'Introfinish':
                     
             deliveryresult = endingcalc()
             
-            print (deliveryresult)
 
             if deliveryresult == ("Not even close"):
-                print ("You didnt make it in time and lost 2 fuel cells")
+                print ("You didnt make it in time and lost 2 fuel cells.")
                 player.lose_fuel(2)
                 player.payment(paycheck)
             if deliveryresult == ("On time"):
-                if fuelcells < 10:
-                    print ("The R.O.T rewards your perfect landing with 2 fuel cells")
+                if player.fuelcells < 10:
+                    print ("The R.O.T rewards your perfect landing with 2 fuel cells.")
                     print ("You gained +2 fuel cells")
-                    fuelcells += 2
+                    player.fuelcells += 2
                 player.payment(paycheck)
             if deliveryresult == ("Too far"):
-                print ("You went too far and missed the date, the R.O.T is dissapointed in your efforts")
+                print ("You went too far and missed the date, the R.O.T is dissapointed in your efforts.")
                 print ("You lost 4 fuel cells") 
                 player.lose_fuel(4)
                 player.payment(paycheck)
-            print (f"You have {player.fuelcells} fuel cells remaining")
-            print (player.money)
+            print (f"You have {player.fuelcells} fuel cells remaining/")
+            print (f"You have ${player.money} in total.")
             print (f'paycheck:{paycheck}')
-                
-            tryagain = input(str("Continue? Y/N: ")).strip().upper()
+            if player.fuelcells <= 0:
+                print ('You have failed the R.O.T. You lost all of your fuel and became stranded.')
+                exit()
+
+
+
+
+
+
+
+
+
             
+            def whosthis():
+                WINDOW_WIDTH = 1600
+                WINDOW_HEIGHT = 1200
+                WHITE = (255, 255, 255)
+                BLACK = (0, 0, 0)
+                pygame.init()
+                pygame.font.init()
+                screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
+                textbubble = pygame.Rect((150, 200, 1250, 100))
+                speakfont = pygame.font.Font('Nerd.ttf', 32)
+                speakpos = ((150, 200))
+                interacting = True
+                
+           
+                while interacting == True:
+                    
+                    if timeoutside >= 100 and timeoutside < 200:
+                        text = speakfont.render(f'Thank you for delivering me this toothbrush Here is ${paycheck}', True, BLACK)
+                        image = pygame.image.load(os.path.join('larson.png'))
+                        pygame.draw.rect(screen, (WHITE), (textbubble))
+                        screen.blit(image, (200,300))
+                        screen.blit(text, speakpos)
+                        pygame.display.update()
+                        pygame.time.delay(7500)
+                        interacting = False
+                        pygame.quit()
+                    elif timeoutside >= 200 and timeoutside < 300: 
+                        text = speakfont.render(f'Thank you for delivering me this calculator Here is ${paycheck}', True, BLACK)
+                        image = pygame.image.load(os.path.join('ein.png'))
+                        pygame.draw.rect(screen, (WHITE), (textbubble))
+                        screen.blit(image, (200,300))
+                        screen.blit(text, speakpos)
+                        pygame.display.update()
+                        pygame.time.delay(7500)
+                        interacting = False
+                        pygame.quit()
+                    elif timeoutside >= 300:
+                        text = speakfont.render(f'ugg ugg (The strange caveman puts some sort of shell necklace in your hands) ${paycheck}???', True, BLACK)
+                        image = pygame.image.load(os.path.join('ugg.png'))
+                        pygame.draw.rect(screen, (WHITE), (textbubble))
+                        screen.blit(image, (200,300))
+                        screen.blit(text, speakpos)
+                        pygame.display.update()
+                        pygame.time.delay(7500)
+                        interacting = False
+                        pygame.quit()
+
+            
+
+                    
+                
+
+
+            whosthis()
+
+
+
+
+
+                
+            tryagain = input(str("Do you want to make another delivery? Y/N: ")).strip().upper()
+        
+
             if tryagain == "Y":
                 player.deliveries += 1
-            #player.money(paycheck)
             
+
             if tryagain == "N":
+                print (f'Good work today. You made {player.money} and made {player.deliveries} deliveries. The R.O.T congratulates you for your hard work')
+                now = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
                 with open("Scores.txt", "a") as achsave:
-                    achsave.write(f"You made {player.deliveries} deliveries and got ${player.money} \n")
+                    achsave.write(f"[{now}] You made {player.deliveries} deliveries and got ${player.money}\n")
                     quit()
                     
